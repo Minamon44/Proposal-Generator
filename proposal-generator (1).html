@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proposal Generator — Freelance</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080b10;
+    --s1: #0e1219;
+    --s2: #141922;
+    --s3: #1c2330;
+    --border: #252d3a;
+    --border2: #2e3a4a;
+    --gold: #f0a500;
+    --gold2: #e05c20;
+    --blue: #3b82f6;
+    --blue2: #6366f1;
+    --green: #10b981;
+    --text: #dde4ef;
+    --muted: #5a6a7e;
+    --muted2: #8896aa;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* Subtle grid background */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(59,130,246,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.025) 1px, transparent 1px);
+    background-size: 52px 52px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative; z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    margin-bottom: 52px;
+    animation: rise 0.5s ease both;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--s2);
+    border: 1px solid var(--border2);
+    border-radius: 100px;
+    padding: 5px 14px 5px 8px;
+    margin-bottom: 22px;
+    font-size: 11px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--muted2);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .eyebrow-dot {
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: blink 2.5s infinite;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(30px, 5.5vw, 46px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 14px;
+  }
+
+  .grad-gold { background: linear-gradient(135deg, var(--gold), var(--gold2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .grad-blue { background: linear-gradient(135deg, var(--blue), var(--blue2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+  .sub { color: var(--muted2); font-size: 15px; font-weight: 300; line-height: 1.6; }
+
+  /* ── MODE TOGGLE ── */
+  .mode-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 28px;
+    animation: rise 0.5s 0.1s ease both;
+  }
+
+  .mode-card {
+    background: var(--s1);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mode-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .mode-card.khamsat::before { background: linear-gradient(135deg, rgba(240,165,0,0.06), rgba(224,92,32,0.06)); }
+  .mode-card.upwork::before  { background: linear-gradient(135deg, rgba(59,130,246,0.06), rgba(99,102,241,0.06)); }
+
+  .mode-card.active.khamsat { border-color: var(--gold); }
+  .mode-card.active.upwork  { border-color: var(--blue); }
+  .mode-card.active::before { opacity: 1; }
+
+  .mode-icon { font-size: 22px; margin-bottom: 8px; display: block; }
+  .mode-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .mode-card.active.khamsat .mode-name { color: var(--gold); }
+  .mode-card.active.upwork  .mode-name { color: var(--blue); }
+
+  .mode-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+  /* ── INPUT CARD ── */
+  .card {
+    background: var(--s1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 14px;
+    animation: rise 0.5s 0.15s ease both;
+    transition: border-color 0.25s;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Input method tabs */
+  .input-tabs {
+    display: flex;
+    gap: 3px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 3px;
+    margin-bottom: 18px;
+  }
+
+  .itab {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    border-radius: 7px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .itab.active {
+    background: var(--s2);
+    color: var(--text);
+    border: 1px solid var(--border2);
+  }
+
+  /* Drop zone */
+  .dropzone {
+    border: 2px dashed var(--border2);
+    border-radius: 12px;
+    padding: 44px 20px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    background: var(--s2);
+    transition: all 0.25s;
+  }
+
+  .dropzone:hover, .dropzone.over {
+    border-color: var(--blue);
+    background: rgba(59,130,246,0.04);
+  }
+
+  .dropzone input[type=file] {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer;
+    width: 100%; height: 100%;
+  }
+
+  .dz-icon { font-size: 34px; display: block; margin-bottom: 10px; }
+  .dz-text { color: var(--muted2); font-size: 14px; line-height: 1.6; }
+  .dz-text strong { color: var(--blue); }
+
+  #img-preview {
+    display: none;
+    margin-top: 14px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  #img-preview img { width: 100%; max-height: 260px; object-fit: contain; background: var(--bg); }
+
+  textarea {
+    width: 100%;
+    background: var(--s2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    resize: vertical;
+    min-height: 150px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { border-color: var(--blue); }
+  textarea::placeholder { color: var(--muted); }
+
+  /* ── UPWORK EXTRAS ── */
+  #upwork-extras {
+    display: none;
+    margin-top: 18px;
+  }
+
+  .row2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 7px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .field input, .field select {
+    width: 100%;
+    background: var(--s2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+  }
+
+  .field input:focus, .field select:focus { border-color: var(--blue); }
+  .field input::placeholder { color: var(--muted); }
+
+  .field select option { background: var(--s2); }
+
+  /* ── TONE PILLS ── */
+  .tone-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 18px;
+  }
+
+  .tone-pill {
+    padding: 6px 14px;
+    border-radius: 100px;
+    border: 1px solid var(--border2);
+    background: var(--s2);
+    color: var(--muted2);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .tone-pill:hover { border-color: var(--muted2); color: var(--text); }
+  .tone-pill.active { border-color: var(--blue); color: var(--blue); background: rgba(59,130,246,0.08); }
+
+  /* ── GENERATE BTN ── */
+  .btn-gen {
+    width: 100%;
+    padding: 17px;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 28px;
+    letter-spacing: 0.3px;
+    animation: rise 0.5s 0.2s ease both;
+  }
+
+  .btn-gen.khamsat-btn { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #fff; }
+  .btn-gen.upwork-btn  { background: linear-gradient(135deg, var(--blue), var(--blue2)); color: #fff; }
+  .btn-gen:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(0,0,0,0.4); }
+  .btn-gen:active { transform: translateY(0); }
+  .btn-gen:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* ── OUTPUT ── */
+  .output-wrap {
+    display: none;
+    animation: rise 0.45s ease both;
+  }
+
+  /* Khamsat single output */
+  .out-card {
+    background: var(--s1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  .out-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--s2);
+  }
+
+  .out-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.6px;
+    text-transform: uppercase;
+    color: var(--muted2);
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .out-label .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .dot-gold { background: var(--gold); }
+  .dot-blue { background: var(--blue); }
+  .dot-green { background: var(--green); }
+
+  .btn-copy {
+    padding: 6px 14px;
+    border: 1px solid var(--border2);
+    border-radius: 7px;
+    background: transparent;
+    color: var(--muted2);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .btn-copy:hover { border-color: var(--blue); color: var(--blue); }
+  .btn-copy.ok    { border-color: var(--green); color: var(--green); }
+
+  .out-body {
+    padding: 22px;
+    font-size: 14px;
+    line-height: 1.85;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* Upwork sections */
+  .upwork-sections { display: flex; flex-direction: column; gap: 14px; }
+
+  /* Skills derived badge */
+  .skills-derived {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 14px 20px;
+    background: rgba(16,185,129,0.04);
+    border-top: 1px solid var(--border);
+  }
+
+  .skill-tag {
+    padding: 3px 10px;
+    border-radius: 100px;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.25);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Error */
+  .err {
+    background: rgba(224,92,32,0.08);
+    border: 1px solid rgba(224,92,32,0.3);
+    border-radius: 10px;
+    padding: 14px 18px;
+    color: #f97316;
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  /* Spinner */
+  .spin {
+    width: 17px; height: 17px;
+    border: 2px solid rgba(255,255,255,0.25);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: rot 0.7s linear infinite;
+  }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); margin: 22px 0; }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  @keyframes rot { to { transform: rotate(360deg); } }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  /* ── API KEY BANNER ── */
+  .key-banner {
+    background: var(--s1);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin-bottom: 28px;
+    animation: rise 0.4s ease both;
+  }
+
+  .key-banner.locked {
+    background: rgba(16,185,129,0.04);
+    border-color: rgba(16,185,129,0.25);
+  }
+
+  .key-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .key-icon { font-size: 18px; }
+
+  .key-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .key-status {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 3px 10px;
+    border-radius: 100px;
+    background: rgba(16,185,129,0.12);
+    color: var(--green);
+    border: 1px solid rgba(16,185,129,0.25);
+    display: none;
+  }
+
+  .key-hint {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .key-hint a { color: var(--blue); text-decoration: none; }
+  .key-hint a:hover { text-decoration: underline; }
+
+  .key-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .key-input {
+    flex: 1;
+    background: var(--s2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .key-input:focus { border-color: var(--blue); }
+  .key-input::placeholder { color: var(--muted); letter-spacing: 0; font-family: 'Inter', sans-serif; font-size: 12px; }
+  .key-input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .btn-key {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 9px;
+    background: var(--blue);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-key:hover { opacity: 0.88; }
+
+  .btn-key-clear {
+    padding: 10px 14px;
+    border: 1px solid var(--border2);
+    border-radius: 9px;
+    background: transparent;
+    color: var(--muted2);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: none;
+  }
+
+  .btn-key-clear:hover { border-color: var(--gold2); color: var(--gold2); }
+
+  @media (max-width: 540px) {
+    .row2 { grid-template-columns: 1fr; }
+    .mode-toggle { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="eyebrow"><div class="eyebrow-dot"></div> Freelance Proposal Generator</div>
+    <h1>Win more clients.<br><span class="grad-blue">Write less.</span></h1>
+    <p class="sub">Paste or screenshot any job — get a tailored, ready-to-send proposal in seconds.</p>
+  </div>
+
+  <!-- API Key Banner -->
+  <div class="key-banner" id="key-banner">
+    <div class="key-top">
+      <span class="key-icon">🔑</span>
+      <span class="key-title">Anthropic API Key</span>
+      <span class="key-status" id="key-status">● Connected</span>
+    </div>
+    <div class="key-hint" id="key-hint">
+      Your key is used only in your browser — never stored or sent anywhere else.<br>
+      Get one free at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys.
+    </div>
+    <div class="key-row">
+      <input class="key-input" id="key-input" type="password" placeholder="sk-ant-api03-...  paste your Anthropic API key here">
+      <button class="btn-key" onclick="saveKey()">Save Key</button>
+      <button class="btn-key-clear" id="btn-clear-key" onclick="clearKey()">✕ Clear</button>
+    </div>
+  </div>
+
+  <!-- Mode toggle -->
+  <div class="mode-toggle">
+    <div class="mode-card khamsat active" onclick="setMode('khamsat')">
+      <span class="mode-icon">🟡</span>
+      <div class="mode-name">Khamsat / خمسات</div>
+      <div class="mode-desc">Short Arabic reply (5–8 lines) for community service requests</div>
+    </div>
+    <div class="mode-card upwork" onclick="setMode('upwork')">
+      <span class="mode-icon">🔵</span>
+      <div class="mode-name">Upwork / Freelance</div>
+      <div class="mode-desc">Full technical + financial proposal for international platforms</div>
+    </div>
+  </div>
+
+  <!-- Input Card -->
+  <div class="card">
+    <div class="card-title">// Project Details</div>
+
+    <div class="input-tabs">
+      <button class="itab active" onclick="switchInput('img')">📷 Screenshot</button>
+      <button class="itab"        onclick="switchInput('txt')">📝 Paste Text</button>
+    </div>
+
+    <!-- Image input -->
+    <div id="pane-img">
+      <div class="dropzone" id="dz">
+        <input type="file" id="file-in" accept="image/*" onchange="handleFile(this.files[0])">
+        <span class="dz-icon">🖼️</span>
+        <div class="dz-text">Drag & drop your screenshot here or <strong>click to upload</strong><br>
+        <span style="font-size:12px;color:var(--muted)">PNG · JPG · WEBP</span></div>
+      </div>
+      <div id="img-preview"><img id="preview-img" src="" alt="preview"></div>
+    </div>
+
+    <!-- Text input -->
+    <div id="pane-txt" style="display:none">
+      <textarea id="task-text" placeholder="Paste the job description here...&#10;&#10;e.g. Looking for a Python developer to automate data extraction from Excel files and push to PostgreSQL..."></textarea>
+    </div>
+
+    <!-- Upwork extras -->
+    <div id="upwork-extras">
+      <div class="divider"></div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;font-family:'JetBrains Mono',monospace">// Proposal Settings</div>
+      <div class="row2">
+        <div class="field">
+          <label>Your Rate ($/hr or fixed)</label>
+          <input type="text" id="rate" placeholder="e.g.  $15/hr  or  $120 fixed">
+        </div>
+        <div class="field">
+          <label>Estimated Delivery</label>
+          <input type="text" id="delivery" placeholder="e.g.  3 days · 1 week">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Your Experience Level</label>
+          <select id="exp-level">
+            <option value="entry">Entry — Building reputation</option>
+            <option value="mid" selected>Mid — 1–2 years experience</option>
+            <option value="senior">Senior — 3+ years</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Proposal Language</label>
+          <select id="lang">
+            <option value="english" selected>English</option>
+            <option value="arabic">Arabic</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tone -->
+    <div style="margin-top:18px">
+      <div style="font-size:11px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;font-family:'JetBrains Mono',monospace">// Tone</div>
+      <div class="tone-row">
+        <div class="tone-pill active" data-tone="professional" onclick="setTone(this)">🎯 Professional</div>
+        <div class="tone-pill" data-tone="confident"    onclick="setTone(this)">💪 Confident</div>
+        <div class="tone-pill" data-tone="friendly"     onclick="setTone(this)">🤝 Friendly</div>
+        <div class="tone-pill" data-tone="direct"       onclick="setTone(this)">⚡ Direct & Concise</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="err" id="err"></div>
+
+  <!-- Generate Button -->
+  <button class="btn-gen khamsat-btn" id="gen-btn" onclick="generate()">
+    <span id="btn-label">✨ Generate Proposal</span>
+  </button>
+
+  <!-- Output -->
+  <div class="output-wrap" id="output-wrap"></div>
+
+</div>
+
+<script>
+  let mode = 'khamsat';
+  let inputMode = 'img';
+  let tone = 'professional';
+  let imgBase64 = null;
+  let imgMime = 'image/png';
+
+  const PROFILE = `
+Name: Mina Mohsen
+Skills: Python (Pandas, automation, scripting), SQL & PostgreSQL, database design (ERD), Machine Learning (Scikit-learn), data cleaning & analysis, dashboards, Telegram bots, API integration, OOP
+Certifications: DEPI AI/Data Science (6-month program), NVIDIA LLM Prompt Engineering
+Portfolio projects: Dream League (PostgreSQL, SQL, ERD), Cache Replacement Simulator (Python, OOP, visualization), 16-bit Mano Computer (Verilog, digital logic, FSM)
+GitHub: github.com/Minamon44 | LinkedIn: linkedin.com/in/mena-mohsen/
+`.trim();
+
+  // ── Mode switch ──
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+    document.querySelector('.mode-card.' + m).classList.add('active');
+    document.getElementById('upwork-extras').style.display = m === 'upwork' ? 'block' : 'none';
+    const btn = document.getElementById('gen-btn');
+    btn.className = 'btn-gen ' + m + '-btn';
+    document.getElementById('output-wrap').style.display = 'none';
+    document.getElementById('output-wrap').innerHTML = '';
+  }
+
+  // ── Input switch ──
+  function switchInput(t) {
+    inputMode = t;
+    document.querySelectorAll('.itab').forEach((b,i) => b.classList.toggle('active', (i===0&&t==='img')||(i===1&&t==='txt')));
+    document.getElementById('pane-img').style.display = t === 'img' ? 'block' : 'none';
+    document.getElementById('pane-txt').style.display = t === 'txt' ? 'block' : 'none';
+  }
+
+  // ── Tone ──
+  function setTone(el) {
+    document.querySelectorAll('.tone-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    tone = el.dataset.tone;
+  }
+
+  // ── Drag & drop ──
+  const dz = document.getElementById('dz');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('over');
+    const f = e.dataTransfer.files[0];
+    if (f && f.type.startsWith('image/')) handleFile(f);
+  });
+
+  function handleFile(f) {
+    if (!f) return;
+    imgMime = f.type || 'image/png';
+    const r = new FileReader();
+    r.onload = e => {
+      imgBase64 = e.target.result.split(',')[1];
+      document.getElementById('preview-img').src = e.target.result;
+      document.getElementById('img-preview').style.display = 'block';
+    };
+    r.readAsDataURL(f);
+  }
+
+  // ── Error ──
+  function showErr(msg) {
+    const el = document.getElementById('err');
+    el.textContent = msg; el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 5000);
+  }
+
+  // ── Loading ──
+  function setLoading(on) {
+    const btn = document.getElementById('gen-btn');
+    btn.disabled = on;
+    document.getElementById('btn-label').innerHTML = on
+      ? '<div class="spin"></div> Generating...'
+      : '✨ Generate Proposal';
+  }
+
+  // ── Main generate ──
+  async function generate() {
+    document.getElementById('err').style.display = 'none';
+
+    // Build user message content
+    let userContent;
+    if (inputMode === 'img') {
+      if (!imgBase64) { showErr('Please upload a screenshot first.'); return; }
+      userContent = [
+        { type: 'image', source: { type: 'base64', media_type: imgMime, data: imgBase64 } },
+        { type: 'text', text: 'This is a screenshot of a freelance job posting. Read it carefully.' }
+      ];
+    } else {
+      const txt = document.getElementById('task-text').value.trim();
+      if (!txt) { showErr('Please paste the job description first.'); return; }
+      userContent = txt;
+    }
+
+    setLoading(true);
+    document.getElementById('output-wrap').style.display = 'none';
+    document.getElementById('output-wrap').innerHTML = '';
+
+    try {
+      if (mode === 'khamsat') {
+        await generateKhamsat(userContent);
+      } else {
+        await generateUpwork(userContent);
+      }
+    } catch(e) {
+      showErr('API error: ' + e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ══════════════════════════════════════
+  //  KHAMSAT — short Arabic reply
+  // ══════════════════════════════════════
+  async function generateKhamsat(userContent) {
+    const toneMap = {
+      professional: 'professional and direct — shows competence and confidence without flattery',
+      confident:    'assertive and strong — immediately demonstrates expertise',
+      friendly:     'warm and collaborative — makes the client feel at ease',
+      direct:       'ultra-concise — maximum impact in minimum words',
+    };
+
+    const system = `You are an expert at writing winning Arabic replies to service requests on خمسات (Khamsat).
+
+Freelancer profile:
+${PROFILE}
+
+Task: Read the job request carefully. Identify the specific technical requirements. Then write a short, Arabic, professional reply that will make the client choose this freelancer.
+
+Tone: ${toneMap[tone]}
+
+Rules:
+1. Start with "السلام عليكم،"
+2. One sentence proving you read and understood the specific request — be concrete, not generic
+3. Mention only the 1–2 skills directly relevant to THIS job (derive from the job, don't list everything)
+4. One sentence on your ability to deliver with quality and speed
+5. If the request is vague, ask ONE specific clarifying question
+6. End with "جاهز للبدء فور الاتفاق. تحياتي."
+7. Length: exactly 5–8 lines. No bullets. Natural flowing paragraph.
+8. Do NOT mention certifications unless directly relevant
+9. Never mention pricing
+
+Also extract: list the specific skills you referenced (as a comma-separated list on a final line prefixed with SKILLS:)
+
+Output format:
+[the Arabic reply]
+SKILLS: skill1, skill2, skill3`;
+
+    const data = await callAPI(system, userContent);
+    const raw = data.content.map(b => b.text || '').join('\n').trim();
+
+    // Split skills line
+    const skillsMatch = raw.match(/SKILLS:\s*(.+)$/m);
+    const skills = skillsMatch ? skillsMatch[1].split(',').map(s => s.trim()) : [];
+    const reply = raw.replace(/SKILLS:.+$/m, '').trim();
+
+    renderKhamsatOutput(reply, skills);
+  }
+
+  function renderKhamsatOutput(reply, skills) {
+    const wrap = document.getElementById('output-wrap');
+    wrap.innerHTML = `
+      <div class="out-card">
+        <div class="out-card-header">
+          <div class="out-label"><div class="dot dot-gold"></div> Khamsat Reply — Ready to Send</div>
+          <button class="btn-copy" onclick="copyText(this, 'out-khamsat')">📋 Copy</button>
+        </div>
+        <div class="out-body" id="out-khamsat" dir="rtl" style="text-align:right;font-family:'Cairo',sans-serif">${escHtml(reply)}</div>
+        ${skills.length ? `<div class="skills-derived">${skills.map(s=>`<span class="skill-tag">${escHtml(s)}</span>`).join('')}</div>` : ''}
+      </div>`;
+    wrap.style.display = 'block';
+    setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+
+    // Load Cairo font for Arabic output if not loaded
+    if (!document.querySelector('link[href*="Cairo"]')) {
+      const l = document.createElement('link');
+      l.rel = 'stylesheet';
+      l.href = 'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap';
+      document.head.appendChild(l);
+    }
+  }
+
+  // ══════════════════════════════════════
+  //  UPWORK — full technical + financial
+  // ══════════════════════════════════════
+  async function generateUpwork(userContent) {
+    const rate     = document.getElementById('rate').value.trim()     || 'negotiable';
+    const delivery = document.getElementById('delivery').value.trim() || 'to be estimated';
+    const expLevel = document.getElementById('exp-level').value;
+    const lang     = document.getElementById('lang').value;
+    const toneMap  = {
+      professional: 'professional and polished',
+      confident:    'assertive and results-focused',
+      friendly:     'warm, approachable, and collaborative',
+      direct:       'direct and concise — no filler',
+    };
+
+    const system = `You are an expert at writing high-converting Upwork proposals that win contracts.
+
+Freelancer profile:
+${PROFILE}
+Rate: ${rate}
+Estimated delivery: ${delivery}
+Experience level context: ${expLevel}
+
+Your task: Read the job posting carefully, identify the exact requirements, and produce a FULL proposal in ${lang}.
+
+Tone: ${toneMap[tone]}
+
+Structure the proposal in these exact sections:
+
+---HOOK---
+A 2–3 sentence opening that immediately addresses the client's core problem. Do NOT start with "I am" or "My name is". Start with the problem or the outcome.
+
+---UNDERSTANDING---
+Show you understood what they need. Paraphrase the key requirement back in your own words (2–3 sentences). This builds trust.
+
+---APPROACH---
+A concise technical plan for how you would execute this project. Mention specific tools, libraries, or methods relevant to THIS project (derive from the job description). 3–5 bullet points or short paragraphs.
+
+---RELEVANT EXPERIENCE---
+1–2 portfolio project references (from the profile above) that are most relevant to this job. Be specific about what's similar.
+
+---FINANCIAL PROPOSAL---
+- Rate: ${rate}
+- Delivery: ${delivery}
+- Brief note on what's included (deliverables)
+- Optional: note about revisions or support
+
+---CLOSING---
+2–3 sentences. Invite them to connect, express readiness to start, and a soft call to action.
+
+Also on a final line: SKILLS: comma-separated list of specific skills you referenced
+
+Keep the total proposal between 280–420 words. No filler. Every sentence must add value.`;
+
+    const data = await callAPI(system, userContent);
+    const raw = data.content.map(b => b.text || '').join('\n').trim();
+
+    const skillsMatch = raw.match(/SKILLS:\s*(.+)$/m);
+    const skills = skillsMatch ? skillsMatch[1].split(',').map(s => s.trim()) : [];
+    const body = raw.replace(/SKILLS:.+$/m, '').trim();
+
+    renderUpworkOutput(body, skills);
+  }
+
+  function renderUpworkOutput(body, skills) {
+    // Parse sections
+    const sections = [
+      { key: 'HOOK',        label: 'Opening Hook',          dot: 'dot-blue'  },
+      { key: 'UNDERSTANDING', label: 'Project Understanding', dot: 'dot-blue'  },
+      { key: 'APPROACH',    label: 'Technical Approach',    dot: 'dot-blue'  },
+      { key: 'RELEVANT EXPERIENCE', label: 'Relevant Experience', dot: 'dot-green' },
+      { key: 'FINANCIAL PROPOSAL',  label: 'Financial Proposal',  dot: 'dot-gold'  },
+      { key: 'CLOSING',     label: 'Closing',               dot: 'dot-green' },
+    ];
+
+    let cards = '';
+    let remaining = body;
+
+    for (let i = 0; i < sections.length; i++) {
+      const { key, label, dot } = sections[i];
+      const nextKey = sections[i + 1] ? sections[i + 1].key : null;
+      const startTag = `---${key}---`;
+      const endTag   = nextKey ? `---${nextKey}---` : null;
+
+      const start = remaining.indexOf(startTag);
+      if (start === -1) continue;
+
+      const contentStart = start + startTag.length;
+      const end = endTag ? remaining.indexOf(endTag) : remaining.length;
+      const content = remaining.slice(contentStart, end === -1 ? remaining.length : end).trim();
+
+      const cardId = 'sec-' + key.toLowerCase().replace(/\s/g, '-');
+      cards += `
+        <div class="out-card">
+          <div class="out-card-header">
+            <div class="out-label"><div class="dot ${dot}"></div> ${label}</div>
+            <button class="btn-copy" onclick="copyText(this, '${cardId}')">📋 Copy</button>
+          </div>
+          <div class="out-body" id="${cardId}">${escHtml(content)}</div>
+        </div>`;
+    }
+
+    // Full proposal copy
+    const fullId = 'full-proposal';
+    const fullText = body.replace(/---[A-Z\s]+---/g, '\n').trim();
+
+    const wrap = document.getElementById('output-wrap');
+    wrap.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-size:11px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);font-family:'JetBrains Mono',monospace">// Upwork Proposal</div>
+        <button class="btn-copy" onclick="copyText(this, '${fullId}')">📋 Copy Full Proposal</button>
+      </div>
+      <div id="${fullId}" style="display:none">${escHtml(fullText)}</div>
+      <div class="upwork-sections">${cards}</div>
+      ${skills.length ? `
+        <div class="out-card" style="margin-top:14px">
+          <div class="out-card-header">
+            <div class="out-label"><div class="dot dot-green"></div> Skills Derived from Job</div>
+          </div>
+          <div style="padding:16px 20px;display:flex;flex-wrap:wrap;gap:7px">
+            ${skills.map(s => `<span class="skill-tag">${escHtml(s)}</span>`).join('')}
+          </div>
+        </div>` : ''}`;
+
+    wrap.style.display = 'block';
+    setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+  }
+
+  // ── API Key management ──
+  let apiKey = sessionStorage.getItem('anthropic_key') || '';
+
+  function saveKey() {
+    const val = document.getElementById('key-input').value.trim();
+    if (!val.startsWith('sk-ant-')) {
+      showErr('Invalid key format — it should start with sk-ant-'); return;
+    }
+    apiKey = val;
+    sessionStorage.setItem('anthropic_key', apiKey);
+    setKeyLocked(true);
+  }
+
+  function clearKey() {
+    apiKey = '';
+    sessionStorage.removeItem('anthropic_key');
+    setKeyLocked(false);
+  }
+
+  function setKeyLocked(locked) {
+    const banner   = document.getElementById('key-banner');
+    const input    = document.getElementById('key-input');
+    const hint     = document.getElementById('key-hint');
+    const status   = document.getElementById('key-status');
+    const clearBtn = document.getElementById('btn-clear-key');
+    if (locked) {
+      banner.classList.add('locked');
+      input.value = apiKey;
+      input.disabled = true;
+      hint.style.display = 'none';
+      status.style.display = 'inline-block';
+      clearBtn.style.display = 'inline-block';
+    } else {
+      banner.classList.remove('locked');
+      input.value = '';
+      input.disabled = false;
+      hint.style.display = 'block';
+      status.style.display = 'none';
+      clearBtn.style.display = 'none';
+    }
+  }
+
+  // Restore key from session on load
+  if (apiKey) setKeyLocked(true);
+
+  // ── API call ──
+  async function callAPI(system, userContent) {
+    if (!apiKey) {
+      throw new Error('Please enter your Anthropic API key first.');
+    }
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1500,
+        system,
+        messages: [{ role: 'user', content: userContent }]
+      })
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message);
+    return data;
+  }
+
+  // ── Copy ──
+  function copyText(btn, id) {
+    const el = document.getElementById(id);
+    const text = el.textContent || el.innerText;
+    navigator.clipboard.writeText(text.trim()).then(() => {
+      btn.classList.add('ok');
+      btn.innerHTML = '✅ Copied!';
+      setTimeout(() => {
+        btn.classList.remove('ok');
+        btn.innerHTML = '📋 Copy';
+      }, 2200);
+    });
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+</script>
+</body>
+</html>
